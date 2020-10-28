@@ -4,12 +4,13 @@ import kotlinx.coroutines.delay
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.event.subscribeAlways
+import net.mamoe.mirai.event.subscribeFriendMessages
 import net.mamoe.mirai.event.subscribeGroupMessages
 import net.mamoe.mirai.join
+import net.mamoe.mirai.message.FriendMessageEvent
 import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.data.At
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.nextMessage
 import redis.clients.jedis.Jedis
 
 // 实际上是隔壁的包
@@ -35,9 +36,19 @@ suspend fun main() {
 
 fun Bot.messageDSL() {
     this.subscribeGroupMessages {
+        // wtf?
         has<At> {
             if (message[At]?.target == bot.id) {
-                reply("差不多得了😅")
+                val text = message.firstOrNull(PlainText)
+                var answer = "差不多得了😅"
+                if (text != null) {
+                    try {
+                        answer = jedis.get(text.contentToString().trim())
+                    } catch (e: Exception) {
+                        reply(answer)
+                    }
+                }
+                reply(answer)
             }
         }
 
@@ -55,6 +66,14 @@ fun Bot.messageDSL() {
             reply(atRoll + " 整挺好😅 ")
         }
 
+    }
+
+    this.subscribeFriendMessages {
+        startsWith("Q=", removePrefix = true) {
+            val value = nextMessage<FriendMessageEvent> { true }
+            jedis.set(it, value.content)
+            reply("Got!")
+        }
     }
 }
 
