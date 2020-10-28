@@ -9,6 +9,7 @@ import net.mamoe.mirai.join
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.content
 import redis.clients.jedis.Jedis
 
 // 实际上是隔壁的包
@@ -21,7 +22,7 @@ val messageArrayList = ArrayList<MessageChain>()
 
 
 suspend fun main() {
-    val bot = Bot(22222222L, "") {
+    val bot = Bot(2274574101L, "deleterious666") {
         fileBasedDeviceInfo("device.json")
     }.alsoLogin()//新建Bot并登录
 
@@ -39,14 +40,21 @@ fun Bot.messageDSL() {
                 reply("差不多得了😅")
             }
         }
-        case("查询灏浓度") {
-            val count = jedis.get(getKey(sender.id))
-            reply("你的灏浓度: $count")
+
+        "查询信用点" {
+            val roll = (0..1000).random()
+            reply("你的信用点剩余: $roll")
         }
-        (contains("灏")) {
-            val key = getKey(sender.id)
-            jedis.incr(key)
+
+        "roll个群友" {
+            val members = this.group.members
+            val membersLength = members.size - 1
+            val rollIndex = (0..membersLength).random()
+            val rollMember = members.elementAt(rollIndex)
+            val atRoll = At(rollMember)
+            reply(atRoll + " 整挺好😅 ")
         }
+
     }
 }
 
@@ -58,8 +66,9 @@ suspend fun directlySubscribe(bot: Bot) {
         messageArrayList.add(message)
 
         val sameMessageListLength = (messageArrayList.filter {
-            it.contentToString() == message.contentToString()
+            it.content == message.content
         }).size
+
 
         print(sameMessageListLength)
         if (sameMessageListLength >= 3) {
