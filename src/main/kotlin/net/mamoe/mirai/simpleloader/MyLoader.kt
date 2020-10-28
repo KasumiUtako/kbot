@@ -53,6 +53,10 @@ fun Bot.messageDSL() {
             }
         }
 
+        "6" {
+            reply("还行8")
+        }
+
         "查询信用点" {
             val roll = (0..1000).random()
             reply("你的信用点剩余: $roll")
