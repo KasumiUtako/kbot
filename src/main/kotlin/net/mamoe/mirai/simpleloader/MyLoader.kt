@@ -47,8 +47,9 @@ fun Bot.messageDSL() {
                     } catch (e: Exception) {
                         reply(answer)
                     }
+                } else {
+                    reply(answer)
                 }
-                reply(answer)
             }
         }
 
