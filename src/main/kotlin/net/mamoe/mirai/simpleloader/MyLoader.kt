@@ -41,13 +41,11 @@ fun Bot.messageDSL() {
             if (message[At]?.target == bot.id) {
                 val text = message.firstOrNull(PlainText)
                 var answer = "差不多得了😅"
-                if (text != null) {
-                    try {
+                try {
+                    if (text != null) {
                         answer = jedis.get(text.contentToString().trim())
-                    } catch (e: Exception) {
-                        reply(answer)
                     }
-                } else {
+                } finally {
                     reply(answer)
                 }
             }
