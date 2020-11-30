@@ -48,11 +48,11 @@ fun Bot.messageDSL() {
                 reply("@${bot.nick} 装弹 #开始游戏")
             } else {
                 if (Random.nextInt(0, remaining) == 0) {
-                    reply(At(sender) + "您被击中了, 游戏结束")
                     remaining = 0
+                    reply(At(sender) + "您被击中了, 游戏结束")
                 } else {
-                    reply(At(sender) + "您的运气好, 没有被击中")
                     remaining -= 1
+                    reply(At(sender) + "您的运气好, 没有被击中。 剩余子弹:${remaining}")
                 }
                 jedis.set(getRussiaGameKey(group.id), remaining.toString())
             }
