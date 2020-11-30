@@ -49,6 +49,7 @@ fun Bot.messageDSL() {
             } else {
                 if (Random.nextInt(0, remaining) == 0) {
                     remaining = 0
+                    sender.mute(60 * 10)
                     reply(At(sender) + "您被击中了, 游戏结束")
                 } else {
                     remaining -= 1
@@ -112,21 +113,23 @@ fun Bot.messageDSL() {
  */
 suspend fun directlySubscribe(bot: Bot) {
     bot.subscribeAlways<GroupMessageEvent> {
-        messageArrayList.add(message)
+        if (message.content.startsWith("#")) {
+            // wait
+        } else {
+            messageArrayList.add(message)
 
-        val sameMessageListLength = (messageArrayList.filter {
-            it.content == message.content
-        }).size
+            val sameMessageListLength = (messageArrayList.filter {
+                it.content == message.content
+            }).size
 
-
-        print(sameMessageListLength)
-        if (sameMessageListLength >= 3) {
-            messageArrayList.clear()
-            delay(((1..2).random() * 1000).toLong())
-            reply(message)
-        }
-        if (messageArrayList.size > 8) {
-            messageArrayList.removeAt(0)
+            if (sameMessageListLength >= 3) {
+                messageArrayList.clear()
+                delay(((1..2).random() * 1000).toLong())
+                reply(message)
+            }
+            if (messageArrayList.size > 8) {
+                messageArrayList.removeAt(0)
+            }
         }
     }
 }
