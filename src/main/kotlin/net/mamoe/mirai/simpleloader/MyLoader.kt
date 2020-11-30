@@ -45,7 +45,7 @@ fun Bot.messageDSL() {
             var remaining = jedis.get(getRussiaGameKey(group.id)).toInt()
 
             if (remaining == 0) {
-                reply("@${bot.nick} 装弹 #开始游戏")
+                reply("#装弹子弹 <子弹数量=默认群成员数> 开始游戏 \n例如: #装填子弹 10")
             } else {
                 if (Random.nextInt(0, remaining) == 0) {
                     remaining = 0
@@ -64,22 +64,23 @@ fun Bot.messageDSL() {
             reply(At(rollMember) + " 整挺好😅 ")
         }
 
+        startsWith("#装填子弹", removePrefix = true) {
+            val count = it.toIntOrNull() ?: group.members.size
+            jedis.set(getRussiaGameKey(group.id), count.toString())
+            reply("装填子弹成功, 数量$count。 游戏开始, 请输入 #开枪 参与游戏")
+        }
+
         // wtf?
         has<At> {
             if (message[At]?.target == bot.id) {
                 val text = message.firstOrNull(PlainText)
                 var answer = "差不多得了😅"
                 if (text != null) {
-                    if (text.contentToString().trim() == "装弹") {
-                        jedis.set(getRussiaGameKey(group.id), group.members.size.toString())
-                        reply("装填子弹成功, 游戏开始, 请输入 #开枪 参与游戏")
-                    } else {
-                        // reply from redis KV
-                        try {
-                            answer = jedis.get(text.contentToString().trim())
-                        } finally {
-                            reply(answer)
-                        }
+                    // reply from redis KV
+                    try {
+                        answer = jedis.get(text.contentToString().trim())
+                    } finally {
+                        reply(answer)
                     }
                 } else {
                     reply(answer)
