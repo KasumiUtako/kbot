@@ -1,5 +1,7 @@
 package net.mamoe.mirai.simpleloader
 
+import io.ktor.client.*
+import io.ktor.client.request.*
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.alsoLogin
@@ -11,7 +13,11 @@ import net.mamoe.mirai.message.FriendMessageEvent
 import net.mamoe.mirai.message.GroupMessageEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.nextMessage
+import net.mamoe.mirai.message.sendImage
 import redis.clients.jedis.Jedis
+import simplelolicon.fetchRemote
+import java.io.File
+import java.io.InputStream
 import kotlin.random.Random
 
 // 实际上是隔壁的包
@@ -63,6 +69,18 @@ fun Bot.messageDSL() {
             val members = group.members
             val rollMember = members.elementAt(Random.nextInt(members.size))
             reply(At(rollMember) + " 整挺好😅 ")
+        }
+
+        startsWith("#h", removePrefix = true) {
+            val lolicon = fetchRemote(it)
+            lolicon.forEach {
+                val loliconstream = HttpClient().use { client -> client.get<InputStream>(it.url) }
+//                val path = "lolicon/caches"
+//                File(path).mkdir()
+//                val filename = "$path/${it.title}.jpg"
+//                File(filename).writeBytes(response)
+                group.sendImage(loliconstream)
+            }
         }
 
         startsWith("#装填子弹", removePrefix = true) {
