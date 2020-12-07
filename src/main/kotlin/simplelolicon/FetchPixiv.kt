@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 private const val LOLICON_API = "https://api.lolicon.app/setu/"
-private val API_KEY = File("APIKEY").readText()
+private val API_KEY = apiKey
 
 @Serializable
 data class Setu(

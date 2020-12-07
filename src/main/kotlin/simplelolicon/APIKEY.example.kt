@@ -1,0 +1,3 @@
+//package simplelolicon
+//
+//val apiKey = ""
