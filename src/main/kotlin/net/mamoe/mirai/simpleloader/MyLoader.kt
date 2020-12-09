@@ -16,7 +16,6 @@ import net.mamoe.mirai.message.nextMessage
 import net.mamoe.mirai.message.sendImage
 import redis.clients.jedis.Jedis
 import simplelolicon.fetchRemote
-import java.io.File
 import java.io.InputStream
 import kotlin.random.Random
 
@@ -33,6 +32,7 @@ val jedis = Jedis("localhost")
 val messageArrayList = ArrayList<MessageChain>()
 
 
+@ExperimentalUnsignedTypes
 suspend fun main() {
     val bot = Bot(2274574101L, "deleterious666") {
         fileBasedDeviceInfo("device.json")
@@ -45,6 +45,7 @@ suspend fun main() {
     bot.join() // 等待 Bot 离线, 避免主线程退出
 }
 
+@ExperimentalUnsignedTypes
 fun Bot.messageDSL() {
     this.subscribeGroupMessages {
         "#开枪" {
@@ -84,7 +85,7 @@ fun Bot.messageDSL() {
         }
 
         startsWith("#装填子弹", removePrefix = true) {
-            val count = it.toIntOrNull() ?: group.members.size
+            val count = it.toUIntOrNull() ?: group.members.size
             jedis.set(getRussiaGameKey(group.id), count.toString())
             reply("装填子弹成功, 数量$count。 游戏开始, 请输入 #开枪 参与游戏")
         }
