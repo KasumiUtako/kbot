@@ -84,6 +84,16 @@ fun Bot.messageDSL() {
             }
         }
 
+        startsWith("#防摸鱼") {
+            val DEFAULT_MIN = 10
+            var min = it.toIntOrNull() ?: DEFAULT_MIN
+            if (min < 1) {
+                min = DEFAULT_MIN
+            }
+            sender.mute(min * 60)
+            reply("防摸鱼 ${min}分钟")
+        }
+
         startsWith("#装填子弹", removePrefix = true) {
             val count = it.toUIntOrNull() ?: group.members.size
             jedis.set(getRussiaGameKey(group.id), count.toString())
