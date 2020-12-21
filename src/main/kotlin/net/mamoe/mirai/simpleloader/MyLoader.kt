@@ -134,6 +134,16 @@ fun Bot.messageDSL() {
             jedis.set(it, value.content)
             reply("Got!")
         }
+
+        startsWith("#啾啾") {
+            val groupId = it.toLongOrNull()
+            if (groupId == null) {
+                reply("参数错误;\n 例如： #啾啾 群ID")
+            } else {
+                getGroup(groupId)[sender.id].unmute()
+                reply("你被放出来了")
+            }
+        }
     }
 }
 
